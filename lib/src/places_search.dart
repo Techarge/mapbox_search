@@ -36,11 +36,15 @@ class PlacesSearch {
 
   String _createUrl(String queryText, [Location? location]) {
     String finalUrl = '$_url${Uri.encodeFull(queryText)}.json?';
+    if (location != null) {
+      finalUrl = '$_url${location.lng},${location.lat}.json?';
+    }
+
     finalUrl += 'access_token=$apiKey';
 
-    if (location != null) {
-      finalUrl += '&proximity=${location.lng}%2C${location.lat}';
-    }
+    // if (location != null) {
+    //   finalUrl += '&proximity=${location.lng}%2C${location.lat}';
+    // }
 
     if (country != null) {
       finalUrl += "&country=$country";
@@ -58,11 +62,11 @@ class PlacesSearch {
       finalUrl += "&types=${types?.value}";
     }
 
+    print("url=$finalUrl");
     return finalUrl;
   }
 
-  Future<List<MapBoxPlace>?> getPlaces(
-    String queryText, {
+  Future<List<MapBoxPlace>?> getPlaces(String queryText, {
     Location? location,
   }) async {
     String url = _createUrl(queryText, location);
@@ -72,6 +76,8 @@ class PlacesSearch {
       throw Exception(json.decode(response.body)['message']);
     }
 
-    return Predictions.fromRawJson(response.body).features;
+    return Predictions
+        .fromRawJson(response.body)
+        .features;
   }
 }
